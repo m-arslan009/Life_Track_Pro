@@ -1,0 +1,118 @@
+.detail-drawer .ant-drawer-content {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  color: #fff !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+.detail-drawer .ant-drawer-wrapper-body,
+.detail-drawer .ant-drawer-body,
+.detail-drawer .ant-drawer-header {
+  background: transparent !important;
+}
+
+.detail-drawer .ant-drawer-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.detail-drawer .ant-drawer-title {
+  color: #fff !important;
+  font-weight: 700;
+}
+
+.detail-drawer .ant-drawer-close {
+  color: #fff !important;
+}
+
+.detail-drawer .ant-drawer-body {
+  color: #fff !important;
+}
+
+.detail-title {
+  color: #fff !important;
+  margin-bottom: 2px !important;
+}
+
+.detail-subtitle {
+  color: #00c9ff !important;
+}
+
+.project-description-box {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.detail-drawer .ant-descriptions-item-label {
+  color: rgba(255, 255, 255, 0.7) !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.detail-drawer .ant-descriptions-item-content {
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.detail-drawer .ant-divider {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.detail-drawer .ant-divider-inner-text {
+  color: #92fe9d !important;
+  font-weight: 600;
+}
+
+.drawer-header-content {
+  margin-bottom: 24px;
+}
+
+.section-spacer {
+  margin-top: 32px;
+}
+
+.section-title {
+  color: #92fe9d !important;
+  margin-bottom: 16px !important;
+  font-weight: 600 !important;
+}
+
+.team-table .ant-table-thead > tr > th {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 12px 16px !important;
+  color: #92fe9d !important;
+}
+
+.team-name {
+  font-weight: 600;
+}
+
+.drawer-footer {
+  margin-top: 48px;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 24px;
+}
+
+.drawer-close-btn {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+  transition: all 0.3s ease;
+}
+
+.drawer-close-btn:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: #00c9ff !important;
+  color: #00c9ff !important;
+}
+
+@media (max-width: 768px) {
+  .detail-drawer .ant-drawer-content-wrapper {
+    width: 100vw !important;
+  }
+}

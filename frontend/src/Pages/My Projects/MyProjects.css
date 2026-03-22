@@ -1,0 +1,115 @@
+.projects-container {
+  padding: 0;
+  width: 100%;
+}
+
+.table-card {
+  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.page-title {
+  color: #fff !important;
+  margin-bottom: 4px !important;
+  font-weight: 700 !important;
+  font-size: 24px !important;
+}
+
+.page-subtitle {
+  color: rgba(255, 255, 255, 0.6) !important;
+  font-size: 14px;
+}
+
+.create-btn {
+  background: linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%) !important;
+  border: none !important;
+  color: #0b1320 !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease;
+  padding: 0 24px !important;
+}
+
+.create-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(146, 254, 157, 0.4) !important;
+  color: #000 !important;
+}
+
+/* Customizing the Ant Design Table for Dark Glassmorphism */
+.custom-table .ant-table {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+.custom-table .ant-table-thead > tr > th {
+  background: rgba(0, 0, 0, 0.2) !important;
+  color: #92FE9D !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.custom-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  transition: background 0.3s ease;
+}
+
+.custom-table .ant-table-tbody > tr:hover > td {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.custom-table .ant-table-pagination.ant-pagination {
+  margin: 16px 0 0 0 !important;
+}
+
+.custom-table .ant-pagination-item-link,
+.custom-table .ant-pagination-item {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.custom-table .ant-pagination-item a {
+  color: #fff !important;
+}
+
+.custom-table .ant-pagination-item-active {
+  background: rgba(0, 201, 255, 0.2) !important;
+  border-color: #00C9FF !important;
+}
+
+.project-name-cell {
+  font-weight: 600;
+  color: #fff;
+}
+
+.action-btn {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+}
+
+.action-btn:hover {
+  background: rgba(0, 201, 255, 0.2) !important;
+  border-color: #00C9FF !important;
+  color: #00C9FF !important;
+}
+
+@media (max-width: 768px) {
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
+
+

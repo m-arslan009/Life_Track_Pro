@@ -1,0 +1,97 @@
+.glass-modal .ant-modal-title {
+  color: #fff !important;
+  font-weight: 700;
+  background: transparent !important;
+  font-size: 20px !important;
+}
+
+.glass-modal .ant-modal-close {
+  color: #fff !important;
+  top: 24px !important;
+}
+
+.glass-modal .ant-form-item-label > label {
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-weight: 500;
+}
+
+.glass-modal .ant-input,
+.glass-modal .ant-select-selector,
+.glass-modal .ant-input-number,
+.glass-modal .ant-picker {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+}
+
+.glass-modal .ant-input::placeholder,
+.glass-modal .ant-select-selection-placeholder {
+  color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.glass-modal .ant-input:hover,
+.glass-modal .ant-input:focus,
+.glass-modal .ant-select-selector:hover,
+.glass-modal .ant-picker:hover {
+  border-color: #00c9ff !important;
+}
+
+.glass-dropdown {
+  background: rgba(24, 25, 26, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.glass-dropdown .ant-select-item {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.glass-dropdown .ant-select-item-option-selected,
+.glass-dropdown .ant-select-item-option-active {
+  background: rgba(0, 201, 255, 0.2) !important;
+  color: #fff !important;
+}
+
+.glass-cancel-btn {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+  border-radius: 8px;
+}
+
+.glass-cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: #fff !important;
+}
+
+.glass-submit-btn {
+  background: linear-gradient(135deg, #00c9ff 0%, #92fe9d 100%) !important;
+  border: none !important;
+  color: #0b1320 !important;
+  font-weight: 600 !important;
+  border-radius: 8px;
+}
+
+.glass-submit-btn:hover {
+  opacity: 0.9;
+  box-shadow: 0 4px 12px rgba(146, 254, 157, 0.3) !important;
+  color: #000 !important;
+}
+
+/* Override Ant Design modal content background for glass effect */
+.glass-modal .ant-modal-content {
+  background: rgba(24, 25, 26, 0.85) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5) !important;
+  border-radius: 16px !important;
+}
+
+/* Ensure modal body is also transparent */
+.glass-modal .ant-modal-body {
+  background: transparent !important;
+  color: #fff !important;
+}

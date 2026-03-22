@@ -1,0 +1,148 @@
+.login-container {
+    background-color: #0d1117;
+    /* Sharing the same vibrant linear-gradient */
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    padding: 20px;
+}
+
+.login-card {
+    background: rgba(255, 255, 255, 0.05); /* very slightly visible glass */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 3rem 3.5rem;
+    border-radius: 16px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 420px;
+    color: white;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-title {
+    color: #ffffff !important;
+    margin-bottom: 0.5rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.5px;
+}
+
+.login-subtitle {
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-size: 14px;
+}
+
+/* Transparent Inputs and strictly border color on hover/focus */
+.login-form .ant-input-affix-wrapper,
+.login-form .ant-input,
+.login-form .ant-input-password {
+    background-color: transparent !important;
+    background: transparent !important;
+    border-radius: 8px;
+    color: white !important;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    box-shadow: none !important; /* No extra glow */
+    transition: border-color 0.3s ease;
+}
+
+.login-form .ant-input-affix-wrapper:hover,
+.login-form .ant-input-affix-wrapper-focused,
+.login-form .ant-input:hover,
+.login-form .ant-input:focus,
+.login-form .ant-input-password:hover,
+.login-form .ant-input-password:focus {
+    border-color: #00C9FF !important; /* ONLY BORDER COLOR CHANGE */
+    background-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important; /* Enforce absolutely no box shadow */
+    outline: none !important;
+}
+
+.login-form .ant-input::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.login-form .ant-input-prefix {
+    color: rgba(255, 255, 255, 0.5);
+    margin-right: 12px;
+    font-size: 18px;
+}
+
+.login-form .ant-input-password-icon {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.login-form .ant-input-password-icon:hover {
+    color: rgba(255, 255, 255, 1) !important;
+}
+
+/* Error messages explicitly aligned completely left */
+.login-form .ant-form-item-explain-error {
+    color: #ff4d4f;
+    text-align: left;
+    margin-top: 4px;
+    font-size: 13px;
+    display: block;
+}
+
+.login-button {
+    height: 48px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 10px;
+    background: linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%);
+    border: none;
+    color: #0b1320;
+    transition: all 0.3s ease;
+}
+
+.login-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(146, 254, 157, 0.4) !important;
+    color: #000 !important;
+}
+
+.login-button:active {
+    transform: translateY(0);
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 24px;
+}
+
+.login-footer .ant-typography {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.login-footer a {
+    color: #92FE9D;
+    font-weight: 600;
+    margin-left: 6px;
+    transition: color 0.3s ease;
+    text-decoration: none;
+}
+
+.login-footer a:hover {
+    color: #00C9FF;
+    text-decoration: underline;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active{
+    -webkit-text-fill-color: white !important;
+    transition: background-color 5000s ease-in-out 0s;
+}

@@ -1,0 +1,118 @@
+.main-layout {
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #0d1117;
+  color: #fff;
+}
+
+.sidebar {
+  background: linear-gradient(180deg, #123b3a 0%, #0b2525 100%) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.sidebar-brand-wrap {
+  padding: 1.4rem 1.1rem 1rem;
+}
+
+.sidebar-brand-title {
+  margin: 0 !important;
+  color: #f1faf8 !important;
+  font-size: 1.4rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.5px;
+}
+
+.sidebar-brand-tagline {
+  margin: 0.25rem 0 0 !important;
+  color: rgba(241, 250, 248, 0.7) !important;
+  font-size: 13px !important;
+}
+
+.sidebar-menu {
+  background: transparent !important;
+  border-right: 0 !important;
+}
+
+.sidebar-menu .ant-menu-item {
+  color: rgba(255, 255, 255, 0.6) !important;
+  margin: 6px 12px !important;
+  width: calc(100% - 24px) !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease;
+  font-size: 15px !important;
+  padding-left: 14px !important;
+  text-align: left !important;
+}
+
+.sidebar-menu .ant-menu-item .ant-menu-item-icon {
+  margin-right: 15px !important;
+  font-size: 18px !important;
+}
+
+.sidebar-menu .ant-menu-item .ant-menu-title-content {
+  margin-left: 0 !important;
+  font-weight: 500;
+}
+
+.sidebar-menu .ant-menu-item:hover,
+.sidebar-menu .ant-menu-item-active {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.sidebar-menu .ant-menu-item-selected {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.16) !important;
+  font-weight: 600 !important;
+  border: none;
+  box-shadow: none;
+}
+
+.sidebar-body-wrap {
+  min-height: calc(100vh - 82px);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-logout-wrap {
+  margin-top: auto;
+  padding: 0.9rem;
+}
+
+.sidebar-logout-button {
+  height: 42px;
+  border-radius: 10px;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  color: #f1faf8 !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.sidebar-logout-button:hover {
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  background: rgba(255, 255, 255, 0.16) !important;
+}
+
+.site-layout {
+  background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+}
+
+.site-content {
+  margin: 24px;
+  min-height: 280px;
+}
+
+.content-container {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  padding: 24px;
+  color: #fff;
+  min-height: 100%;
+}
