@@ -8,77 +8,131 @@ import {
   Typography,
   Card,
   Tooltip,
-  notification
+  Select,
+  notification,
 } from "antd";
-import { PlusOutlined, EyeOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  EyeOutlined,
+  DeleteOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
 import ProjectFormModal from "../../Components/Projects/ProjectFormModal";
 import ProjectDetailDrawer from "../../Components/Projects/ProjectDetailDrawer";
 import "./MyProjects.css";
 
-import { deleteProject } from "../../Services/projectServices";
 import { useLoaderData } from "react-router-dom";
 import { message, Popconfirm } from "antd";
+import ProjectDashboard from "../../Components/Projects/ProjectDashboard";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  deleteProjectThunk,
+  fetchProjects,
+  getSelectedProject,
+  selectProjects,
+  selectProjectsLoading,
+  setSelectedProject,
+  updateProjectStatusThunk,
+} from "../../Services/ProjectSlice";
+import {
+  getCurrentUser,
+  getStoredAuthUserId,
+} from "../../Services/userServices";
 
 const { Title } = Typography;
 
 export default function MyProjects() {
-  const [api, contextHolder] = notification.useNotification()
-  const { users, projects: loadedProjects } = useLoaderData();
-  const [projects, setProjects] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useDispatch();
+  const [api, contextHolder] = notification.useNotification();
+  const { users } = useLoaderData();
+  const projects = useSelector(selectProjects);
+  const selectedProject = useSelector(getSelectedProject);
+  const isLoading = useSelector(selectProjectsLoading);
+  const [isProjectDashboardOpen, setIsProjectDashboardOpen] = useState(false);
+  const [authUserId, setAuthUserId] = useState(() => getStoredAuthUserId());
 
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [formMode, setFormMode] = useState('create'); // 'create' or 'update'
-
-  const [selectedProject, setSelectedProject] = useState(null);
+  const [formMode, setFormMode] = useState("create"); // 'create' or 'update'
 
   useEffect(() => {
-    if (loadedProjects) {
-      setProjects(loadedProjects);
-      setIsLoading(false);
-    }
-  }, [loadedProjects]);
+    dispatch(fetchProjects()).catch(() => {
+      notification.error({
+        message: "Failed to load projects",
+        description:
+          "Unable to load project. Check your internet and make sure backend is running",
+        duration: 1.5,
+        placement: "topRight",
+      });
+    });
+  }, [dispatch]);
 
+  useEffect(() => {
+    if (authUserId) return;
+
+    getCurrentUser()
+      .then((user) => setAuthUserId(user?.id || null))
+      .catch(() => {
+        setAuthUserId(null);
+      });
+  }, [authUserId]);
 
   const handleOpenDetail = (record) => {
-    setSelectedProject(record);
-    setIsDetailOpen(true);
+    dispatch(setSelectedProject(record));
+    setIsProjectDashboardOpen(true);
   };
 
   const handleOpenCreate = () => {
-    setFormMode('create');
-    setSelectedProject(null);
+    setFormMode("create");
+    dispatch(setSelectedProject(null));
     setIsFormOpen(true);
   };
 
   const handleOpenEdit = (record) => {
-    setFormMode('update');
-    setSelectedProject(record);
+    setFormMode("update");
+    dispatch(setSelectedProject(record));
     setIsFormOpen(true);
   };
 
-  const handleFormSuccess = (project, mode) => {
-    if (mode === 'create') {
-      setProjects([project, ...projects]);
-    } else {
-      setProjects(projects.map(p => p.id === project.id ? project : p));
-    }
-  };
+  const handleFormSuccess = () => {};
 
   const handleDeleteProject = async (projectId) => {
     try {
-      await deleteProject(projectId);
+      await dispatch(deleteProjectThunk(projectId));
       api.success({
         message: "Deletion Successful",
         description: "Project deleted successfully",
-        duration: 3, 
-        placement: "topRight"
+        duration: 3,
+        placement: "topRight",
       });
-      setProjects(projects.filter((p) => p.id !== projectId));
     } catch (error) {
       message.error(error.message || "Failed to delete project");
     }
+  };
+
+  const handleStatusChange = async (record, status) => {
+    try {
+      await dispatch(
+        updateProjectStatusThunk({ projectId: record.id, status }),
+      );
+      api.success({
+        message: "Status Updated",
+        description: `${record.project_name} is now ${status.replace("_", " ")}.`,
+        duration: 2,
+        placement: "topRight",
+      });
+    } catch (error) {
+      api.error({
+        message: "Status Update Failed",
+        description: error.message || "Could not update project status.",
+        duration: 2,
+        placement: "topRight",
+      });
+    }
+  };
+
+  const canManageProject = (record) => {
+    if (!authUserId) return false;
+    return Number(record.owner_id) === Number(authUserId);
   };
 
   const getStatusTag = (status) => {
@@ -107,7 +161,21 @@ export default function MyProjects() {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status) => getStatusTag(status),
+      render: (status, record) => (
+        <Select
+          size="small"
+          value={status}
+          disabled={!canManageProject(record)}
+          onChange={(nextStatus) => handleStatusChange(record, nextStatus)}
+          options={[
+            { label: "Active", value: "active" },
+            { label: "On Track", value: "on_track" },
+            { label: "At Risk", value: "at_risk" },
+            { label: "Complete", value: "complete" },
+          ]}
+          style={{ minWidth: 126 }}
+        />
+      ),
     },
     {
       title: "Start Date",
@@ -133,43 +201,62 @@ export default function MyProjects() {
     {
       title: "Actions",
       key: "actions",
-      render: (_, record) => (
-        <Space size="middle">
-          <Tooltip title="View Project Details">
-            <Button
-              type="primary"
-              icon={<EyeOutlined />}
-              onClick={() => handleOpenDetail(record)}
-              className="action-btn"
-            />
-          </Tooltip>
-          <Tooltip title="Edit Project">
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              onClick={() => handleOpenEdit(record)}
-              className="action-btn edit-btn"
-            />
-          </Tooltip>
-          <Tooltip title="Delete Project">
-            <Popconfirm
-              title="Delete Project"
-              description="Are you sure you want to delete this project? This action cannot be undone."
-              onConfirm={() => handleDeleteProject(record.id)}
-              okText="Yes"
-              cancelText="No"
-              okButtonProps={{ danger: true }}
+      render: (_, record) => {
+        const isOwner = canManageProject(record);
+
+        return (
+          <Space size="middle">
+            <Tooltip title="View Project Details">
+              <Button
+                type="primary"
+                icon={<EyeOutlined />}
+                onClick={() => handleOpenDetail(record)}
+                className="action-btn"
+              />
+            </Tooltip>
+            <Tooltip
+              title={
+                isOwner
+                  ? "Edit Project"
+                  : "Only project creator can edit project details"
+              }
             >
               <Button
                 type="primary"
-                danger
-                icon={<DeleteOutlined />}
-                className="action-btn"
+                icon={<EditOutlined />}
+                onClick={() => handleOpenEdit(record)}
+                className="action-btn edit-btn"
+                disabled={!isOwner}
               />
-            </Popconfirm>
-          </Tooltip>
-        </Space>
-      ),
+            </Tooltip>
+            <Tooltip
+              title={
+                isOwner
+                  ? "Delete Project"
+                  : "Only project creator can delete this project"
+              }
+            >
+              <Popconfirm
+                title="Delete Project"
+                description="Are you sure you want to delete this project? This action cannot be undone."
+                onConfirm={() => handleDeleteProject(record.id)}
+                okText="Yes"
+                cancelText="No"
+                okButtonProps={{ danger: true }}
+                disabled={!isOwner}
+              >
+                <Button
+                  type="primary"
+                  danger
+                  icon={<DeleteOutlined />}
+                  className="action-btn"
+                  disabled={!isOwner}
+                />
+              </Popconfirm>
+            </Tooltip>
+          </Space>
+        );
+      },
     },
   ];
 
@@ -180,10 +267,10 @@ export default function MyProjects() {
         <div className="table-header">
           <div>
             <Title level={3} className="page-title">
-              My Projects
+              Projects
             </Title>
             <Typography.Text className="page-subtitle">
-              Track and manage your active project workflows.
+              Projects you created or are assigned to.
             </Typography.Text>
           </div>
           <Button
@@ -208,20 +295,25 @@ export default function MyProjects() {
         />
       </Card>
 
+      <ProjectDashboard
+        isOpen={isProjectDashboardOpen}
+        onClose={() => setIsProjectDashboardOpen(false)}
+      />
+
       <ProjectFormModal
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
         userList={users}
-        isCreated={formMode === 'create'}
+        isCreated={formMode === "create"}
         record={selectedProject}
         onSuccess={handleFormSuccess}
       />
 
-      <ProjectDetailDrawer
+      {/* <ProjectDetailDrawer
         isOpen={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}
         project={selectedProject}
-      />
+      /> */}
     </div>
   );
 }

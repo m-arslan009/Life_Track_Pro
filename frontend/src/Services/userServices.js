@@ -1,5 +1,7 @@
 const API_BASE_URL = "http://localhost:8000/api";
 
+const AUTH_USER_KEY = "authUser";
+
 export const registerUser = async (userData) => {
   try {
     const response = await fetch(`${API_BASE_URL}/users/`, {
@@ -57,7 +59,9 @@ export const loginUser = async (username, password) => {
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(
-        errorData.non_field_errors?.[0] || "Invalid credentials.",
+        errorData.non_field_errors?.[0] ||
+          errorData.detail ||
+          "Invalid credentials.",
       );
     }
 
@@ -65,6 +69,10 @@ export const loginUser = async (username, password) => {
 
     if (data.token) {
       localStorage.setItem("authToken", data.token);
+    }
+
+    if (data.user) {
+      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
     }
 
     return data;
@@ -78,7 +86,7 @@ export const getCurrentUser = async () => {
     const token = localStorage.getItem("authToken");
     if (!token) throw new Error("No authentication token found.");
 
-    const response = await fetch(`${API_BASE_URL}/users/`, {
+    const response = await fetch(`${API_BASE_URL}/users/me/`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -90,11 +98,26 @@ export const getCurrentUser = async () => {
       throw new Error("Failed to fetch user data.");
     }
 
-    return await response.json();
+    const data = await response.json();
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data));
+    return data;
   } catch (error) {
     throw error;
   }
 };
+
+export const getStoredAuthUser = () => {
+  const raw = localStorage.getItem(AUTH_USER_KEY);
+  if (!raw) return null;
+
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+};
+
+export const getStoredAuthUserId = () => getStoredAuthUser()?.id ?? null;
 
 export const getAllUsers = async () => {
   try {
@@ -119,4 +142,5 @@ export const getAllUsers = async () => {
 
 export const logoutUser = () => {
   localStorage.removeItem("authToken");
+  localStorage.removeItem(AUTH_USER_KEY);
 };

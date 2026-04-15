@@ -67,4 +67,17 @@ def user_login(request):
     
     # Safely get an existing token or create a new one to prevent server crashes
     token, created = Token.objects.get_or_create(user=user)
-    return Response({'token': token.key}, status=status.HTTP_200_OK)
+    return Response(
+        {
+            'token': token.key,
+            'user': UserSerializer(user).data,
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def current_user(request):
+    serializer = UserSerializer(request.user)
+    return Response(serializer.data, status=status.HTTP_200_OK)

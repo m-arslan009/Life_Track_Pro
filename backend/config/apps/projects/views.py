@@ -1,10 +1,16 @@
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
+from django.db.models import Q
 from .models import Projects, TeamMembers
 from .serializers import ProjectSerializer
+
+
+def _is_owner_or_member(project, user):
+    if project.owner_id == user:
+        return True
+    return TeamMembers.objects.filter(Projects=project, user=user).exists()
 
 # Create your views here.
 @api_view(['POST'])
@@ -17,7 +23,6 @@ def createProject(request):
     if serializer.is_valid():
         try:
             project = serializer.save(owner_id=request.user)
-            print("Project Saved:", project.id)
             
             from django.contrib.auth import get_user_model
             User = get_user_model()
@@ -29,26 +34,28 @@ def createProject(request):
                         user=user,
                         role='developer' 
                     )
-                    print(f"Added member {user_id} to project {project.id}")
                 except User.DoesNotExist:
-                    print(f"User {user_id} not found")
                     continue
                     
             # Re-serialize to include newly added team members
             result_serializer = ProjectSerializer(project)
             return Response(result_serializer.data, status=status.HTTP_201_CREATED)
         except Exception as e:
-            print("Error during creation:", str(e))
             return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-    print("Validation Errors:", serializer.errors)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def getAllProjects(request):
     try:
-        projectList = Projects.objects.all()
+        projectList = (
+            Projects.objects.filter(
+                Q(owner_id=request.user) | Q(teamMembers__user=request.user)
+            )
+            .distinct()
+            .order_by('-id')
+        )
         serializer = ProjectSerializer(projectList, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
@@ -106,4 +113,31 @@ def projectDetail(request, pk):
         project.delete()
         return Response({'Detail': 'Project deleted successfully'}, status=status.HTTP_200_OK)
 
-    return Response({'Detail': 'Method not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    return Response({'Detail': 'Method not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def projectStatusUpdate(request, pk):
+    try:
+        project = Projects.objects.get(id=pk)
+    except Projects.DoesNotExist:
+        return Response({'Detail': 'Project not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if project.owner_id != request.user:
+        return Response({'Detail': "Only the project owner can change project status"}, status=status.HTTP_403_FORBIDDEN)
+
+    next_status = request.data.get('status')
+    valid_statuses = [choice[0] for choice in Projects._meta.get_field('status').choices]
+
+    if next_status not in valid_statuses:
+        return Response(
+            {'status': [f"Invalid status. Allowed values: {', '.join(valid_statuses)}"]},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    project.status = next_status
+    project.save(update_fields=['status'])
+
+    serializer = ProjectSerializer(project)
+    return Response(serializer.data, status=status.HTTP_200_OK)

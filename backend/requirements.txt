@@ -1,8 +1,4 @@
-﻿asgiref==3.11.1
+﻿# Core backend dependencies (Python 3.12+ recommended)
 Django==6.0.3
-django-cors-headers==4.9.0
 djangorestframework==3.16.1
-pytz==2026.1.post1
-setuptools==82.0.1
-sqlparse==0.5.5
-tzdata==2025.3
+django-cors-headers==4.9.0

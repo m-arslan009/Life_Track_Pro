@@ -1,6 +1,6 @@
-import React from 'react';
-import { Layout, Menu, Button, Typography } from 'antd';
-import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import React from "react";
+import { Layout, Menu, Button, Typography } from "antd";
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import {
   AppstoreOutlined,
   ProjectOutlined,
@@ -11,10 +11,10 @@ import {
   BellOutlined,
   SettingOutlined,
   LogoutOutlined,
-  RobotOutlined
-} from '@ant-design/icons';
-import { logoutUser } from '../../Services/userServices';
-import './SideBar.css';
+  RobotOutlined,
+} from "@ant-design/icons";
+import { logoutUser } from "../../Services/userServices";
+import "./SideBar.css";
 
 const { Sider, Content } = Layout;
 const { Title, Paragraph } = Typography;
@@ -25,68 +25,50 @@ export default function SideBar() {
 
   const handleLogout = () => {
     logoutUser();
-    navigate('/login');
+    navigate("/login");
   };
 
   // Define sidebar items based on extracted JSON data
   const menuItems = [
     {
-      key: '/dashboard',
+      key: "/dashboard",
       icon: <AppstoreOutlined />,
-      label: 'Dashboard',
+      label: "Dashboard",
     },
     {
-      key: '/projects',
+      key: "/projects",
       icon: <ProjectOutlined />,
-      label: 'My Projects',
+      label: "Projects",
     },
     {
-      key: '/milestones',
-      icon: <FlagOutlined />,
-      label: 'Milestones',
-    },
-    {
-      key: '/tasks',
-      icon: <CheckSquareOutlined />,
-      label: 'Tasks',
-    },
-    {
-      key: '/calendar',
-      icon: <CalendarOutlined />,
-      label: 'Calendar',
-    },
-    {
-      key: '/reports',
+      key: "/reports",
       icon: <BarChartOutlined />,
-      label: 'Reports',
+      label: "Reports",
     },
     {
-      key: '/assistant',
+      key: "/assistant",
       icon: <RobotOutlined />,
-      label: 'AI Assistant',
+      label: "AI Assistant",
     },
     {
-      key: '/notifications',
+      key: "/notifications",
       icon: <BellOutlined />,
-      label: 'Notifications',
+      label: "Notifications",
     },
     {
-      key: '/settings',
+      key: "/settings",
       icon: <SettingOutlined />,
-      label: 'Settings',
+      label: "Settings",
     },
   ];
 
   return (
     <Layout className="main-layout">
-      <Sider 
-        width={260}
-        className="sidebar"
-        breakpoint="lg"
-        collapsedWidth="0"
-      >
+      <Sider width={260} className="sidebar" breakpoint="lg" collapsedWidth="0">
         <div className="sidebar-brand-wrap">
-          <Title level={4} className="sidebar-brand-title">LifeTrack Pro</Title>
+          <Title level={4} className="sidebar-brand-title">
+            LifeTrack Pro
+          </Title>
         </div>
 
         <div className="sidebar-body-wrap">
@@ -111,7 +93,7 @@ export default function SideBar() {
           </div>
         </div>
       </Sider>
-      
+
       <Layout className="site-layout">
         <Content className="site-content">
           <div className="content-container">

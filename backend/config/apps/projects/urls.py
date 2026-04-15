@@ -5,4 +5,5 @@ urlpatterns = [
     path('create/', views.createProject, name='create-project'),
     path('projects/', views.getAllProjects, name='get_all_projects'),
     path('<int:pk>/', views.projectDetail, name='project-detail'),
+    path('<int:pk>/status/', views.projectStatusUpdate, name='project-status-update'),
 ]

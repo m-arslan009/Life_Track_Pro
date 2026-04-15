@@ -1,3 +1,7 @@
+.glass-modal .ant-modal-container {
+  background-color: transparent !important;
+}
+
 .glass-modal .ant-modal-title {
   color: #fff !important;
   font-weight: 700;
@@ -94,4 +98,36 @@
 .glass-modal .ant-modal-body {
   background: transparent !important;
   color: #fff !important;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+}
+
+.project-form-modal__form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.project-form-modal__scroll-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 8px;
+  margin-right: -8px;
+}
+
+.project-form-modal__scroll-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.project-form-modal__scroll-area::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+}
+
+.project-form-modal__scroll-area::-webkit-scrollbar-track {
+  background: transparent;
 }

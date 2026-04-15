@@ -16,15 +16,12 @@ import SideBar from "./Components/Layout/SideBar";
 // Sidebar Pages
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import MyProjects from "./Pages/My Projects/MyProjects";
-import Milestones from "./Pages/Milestones/Milestones";
-import Tasks from "./Pages/Tasks/Tasks";
 import CalendarView from "./Pages/Calendar/Calendar";
 import Reports from "./Pages/Reports/Reports";
 import AIAssistant from "./Pages/AI Assistant/AIAssistant";
 import Notifications from "./Pages/Notifications/Notifications";
 import Settings from "./Pages/Settings/Settings";
 import { getAllUsers } from "./Services/userServices";
-import { getAllProjects } from "./Services/projectServices";
 
 const router = createBrowserRouter([
   {
@@ -47,15 +44,10 @@ const router = createBrowserRouter([
         path: "/projects",
         element: <MyProjects />,
         loader: async () => {
-          const [users, projects] = await Promise.all([
-            getAllUsers(),
-            getAllProjects(),
-          ]);
-          return { users, projects };
+          const users = await getAllUsers();
+          return { users };
         },
       },
-      { path: "/milestones", element: <Milestones /> },
-      { path: "/tasks", element: <Tasks /> },
       { path: "/calendar", element: <CalendarView /> },
       { path: "/reports", element: <Reports /> },
       { path: "/assistant", element: <AIAssistant /> },
