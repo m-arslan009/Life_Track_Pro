@@ -1,5 +1,6 @@
 from django.urls import path
+from . import views
 
 urlpatterns = [
-    # Paths will be added later
+    path('overview/', views.reportsOverview, name='reports-overview'),
 ]

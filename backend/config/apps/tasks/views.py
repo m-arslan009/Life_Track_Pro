@@ -7,6 +7,7 @@ from .models import Task
 from .serializers import TaskSerializer
 from projects.models import Projects, TeamMembers
 from projects.progress import recalculate_project_progress
+from notifications.services import actor_message, notify_project_event, send_notification
 
 
 def _project_visible_to_user(project, user):
@@ -55,6 +56,21 @@ def taskListCreate(request):
 				status=status.HTTP_403_FORBIDDEN,
 			)
 		task = serializer.save()
+		notify_project_event(
+			project=task.project,
+			notification_type="project_updated",
+			title="Task Created",
+			message=actor_message(request.user, f"created task '{task.title}'."),
+		)
+		if task.assignee and task.assignee.user_id:
+			send_notification(
+				user_ids=[task.assignee.user_id],
+				notification_type="task_assigned",
+				title="Task Assigned",
+				message=actor_message(request.user, f"assigned task '{task.title}' to you."),
+				project=task.project,
+				task=task,
+			)
 		recalculate_project_progress(task.project)
 		return Response(TaskSerializer(task).data, status=status.HTTP_201_CREATED)
 	return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -90,7 +106,42 @@ def taskDetail(request, pk):
 			context={"request": request},
 		)
 		if serializer.is_valid():
+			previous_status = task.status
+			previous_assignee_id = task.assignee.user_id if task.assignee else None
 			updated = serializer.save()
+			notify_project_event(
+				project=updated.project,
+				notification_type="project_updated",
+				title="Task Updated",
+				message=actor_message(request.user, f"updated task '{updated.title}'."),
+				task=updated,
+			)
+			new_assignee_id = updated.assignee.user_id if updated.assignee else None
+			if new_assignee_id and previous_assignee_id != new_assignee_id:
+				send_notification(
+					user_ids=[new_assignee_id],
+					notification_type="task_assigned",
+					title="Task Assigned",
+					message=actor_message(request.user, f"assigned task '{updated.title}' to you."),
+					project=updated.project,
+					task=updated,
+				)
+			if previous_status != updated.status and updated.status == Task.STATUS_DONE:
+				notify_project_event(
+					project=updated.project,
+					notification_type="task_completed",
+					title="Task Completed",
+					message=actor_message(request.user, f"completed task '{updated.title}'."),
+					task=updated,
+				)
+			elif previous_status != updated.status and updated.status == Task.STATUS_BLOCKED:
+				notify_project_event(
+					project=updated.project,
+					notification_type="task_blocked",
+					title="Task Blocked",
+					message=actor_message(request.user, f"marked task '{updated.title}' as blocked."),
+					task=updated,
+				)
 			recalculate_project_progress(updated.project)
 			return Response(TaskSerializer(updated).data, status=status.HTTP_200_OK)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -101,6 +152,12 @@ def taskDetail(request, pk):
 			{"Detail": "Only the project owner can delete tasks"},
 			status=status.HTTP_403_FORBIDDEN,
 		)
+	notify_project_event(
+		project=task_project,
+		notification_type="project_updated",
+		title="Task Deleted",
+		message=actor_message(request.user, f"deleted task '{task.title}'."),
+	)
 	task.delete()
 	recalculate_project_progress(task_project)
 	return Response({"Detail": "Task deleted"}, status=status.HTTP_200_OK)
@@ -130,6 +187,31 @@ def taskStatusUpdate(request, pk):
 
 	task.status = status_value
 	task.save(update_fields=["status", "updated_at"])
+
+	if status_value == Task.STATUS_DONE:
+		notify_project_event(
+			project=task.project,
+			notification_type="task_completed",
+			title="Task Completed",
+			message=actor_message(request.user, f"completed task '{task.title}'."),
+			task=task,
+		)
+	elif status_value == Task.STATUS_BLOCKED:
+		notify_project_event(
+			project=task.project,
+			notification_type="task_blocked",
+			title="Task Blocked",
+			message=actor_message(request.user, f"marked task '{task.title}' as blocked."),
+			task=task,
+		)
+	else:
+		notify_project_event(
+			project=task.project,
+			notification_type="project_updated",
+			title="Task Status Updated",
+			message=actor_message(request.user, f"updated task '{task.title}' status to {task.status}."),
+			task=task,
+		)
 	recalculate_project_progress(task.project)
 
 	return Response(TaskSerializer(task).data, status=status.HTTP_200_OK)

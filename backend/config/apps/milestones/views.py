@@ -7,6 +7,7 @@ from .models import Milestone
 from .serializers import MilestoneSerializer
 from projects.models import TeamMembers
 from projects.progress import recalculate_project_progress
+from notifications.services import actor_message, notify_project_event
 
 
 def _project_visible_to_user(project, user):
@@ -43,6 +44,13 @@ def milestoneListCreate(request):
 				status=status.HTTP_403_FORBIDDEN,
 			)
 		milestone = serializer.save()
+		notify_project_event(
+			project=milestone.project,
+			notification_type="milestone_created",
+			title="Milestone Created",
+			message=actor_message(request.user, f"created milestone '{milestone.title}'."),
+			milestone=milestone,
+		)
 		return Response(MilestoneSerializer(milestone).data, status=status.HTTP_201_CREATED)
 	return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -77,7 +85,24 @@ def milestoneDetail(request, pk):
 			context={"request": request},
 		)
 		if serializer.is_valid():
+			previous_status = milestone.status
 			updated = serializer.save()
+			if previous_status != updated.status and updated.status == Milestone.STATUS_COMPLETED:
+				notify_project_event(
+					project=updated.project,
+					notification_type="milestone_completed",
+					title="Milestone Completed",
+					message=actor_message(request.user, f"completed milestone '{updated.title}'."),
+					milestone=updated,
+				)
+			else:
+				notify_project_event(
+					project=updated.project,
+					notification_type="project_updated",
+					title="Milestone Updated",
+					message=actor_message(request.user, f"updated milestone '{updated.title}'."),
+					milestone=updated,
+				)
 			return Response(MilestoneSerializer(updated).data, status=status.HTTP_200_OK)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -87,6 +112,12 @@ def milestoneDetail(request, pk):
 			{"Detail": "Only the project owner can delete milestones"},
 			status=status.HTTP_403_FORBIDDEN,
 		)
+	notify_project_event(
+		project=project,
+		notification_type="project_updated",
+		title="Milestone Deleted",
+		message=actor_message(request.user, f"deleted milestone '{milestone.title}'."),
+	)
 	milestone.delete()
 	recalculate_project_progress(project)
 	return Response({"Detail": "Milestone deleted"}, status=status.HTTP_200_OK)
@@ -116,5 +147,22 @@ def milestoneStatusUpdate(request, pk):
 
 	milestone.status = status_value
 	milestone.save(update_fields=["status", "updated_at"])
+
+	if status_value == Milestone.STATUS_COMPLETED:
+		notify_project_event(
+			project=milestone.project,
+			notification_type="milestone_completed",
+			title="Milestone Completed",
+			message=actor_message(request.user, f"completed milestone '{milestone.title}'."),
+			milestone=milestone,
+		)
+	else:
+		notify_project_event(
+			project=milestone.project,
+			notification_type="project_updated",
+			title="Milestone Status Updated",
+			message=actor_message(request.user, f"updated milestone '{milestone.title}' status to {milestone.status}."),
+			milestone=milestone,
+		)
 
 	return Response(MilestoneSerializer(milestone).data, status=status.HTTP_200_OK)
