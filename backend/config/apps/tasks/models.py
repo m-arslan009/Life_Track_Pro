@@ -1,6 +1,6 @@
 from django.db import models
-from projects.models import Projects, TeamMembers
-from milestones.models import Milestone
+from config.apps.projects.models import Projects, TeamMembers
+from config.apps.milestones.models import Milestone
 
 
 class Task(models.Model):

@@ -1,8 +1,8 @@
 from datetime import date
 from rest_framework import serializers
 from .models import Milestone
-from projects.models import Projects, TeamMembers
-from tasks.serializers import TaskSerializer
+from config.apps.projects.models import Projects, TeamMembers
+from config.apps.tasks.serializers import TaskSerializer
 
 
 class MilestoneSerializer(serializers.ModelSerializer):

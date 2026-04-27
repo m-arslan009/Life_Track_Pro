@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Task
-from projects.models import TeamMembers
+from config.apps.projects.models import TeamMembers
 
 
 class TaskSerializer(serializers.ModelSerializer):

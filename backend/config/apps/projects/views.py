@@ -6,7 +6,7 @@ from django.db.models import Count, Q
 from django.utils import timezone
 from .models import Projects, TeamMembers
 from .serializers import ProjectSerializer
-from notifications.services import actor_message, notify_project_event
+from config.apps.notifications.services import actor_message, notify_project_event
 
 
 def _is_owner_or_member(project, user):

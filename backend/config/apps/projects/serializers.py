@@ -1,8 +1,8 @@
 from rest_framework import serializers
 from datetime import date, timedelta
 from .models import Projects, TeamMembers
-from users.serializers import UserSerializer
-from milestones.models import Milestone
+from config.apps.users.serializers import UserSerializer
+from config.apps.milestones.models import Milestone
 
 class TeamMemberSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)

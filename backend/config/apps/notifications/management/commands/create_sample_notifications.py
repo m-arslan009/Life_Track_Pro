@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
-from notifications.models import Notification
-from projects.models import Projects
+from config.apps.notifications.models import Notification
+from config.apps.projects.models import Projects
 from django.utils import timezone
 from datetime import timedelta
 

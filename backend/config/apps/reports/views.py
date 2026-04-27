@@ -9,9 +9,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from milestones.models import Milestone
-from projects.models import Projects
-from tasks.models import Task
+from config.apps.milestones.models import Milestone
+from config.apps.projects.models import Projects
+from config.apps.tasks.models import Task
 
 
 def _visible_projects(user):

@@ -1,4 +1,4 @@
-from tasks.models import Task
+from config.apps.tasks.models import Task
 
 
 COMPLETED_TASK_STATUSES = {"done", "completed", "complete", "closed"}

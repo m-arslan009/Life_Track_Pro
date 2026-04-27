@@ -5,9 +5,9 @@ from rest_framework.response import Response
 from django.db.models import Q
 from .models import Milestone
 from .serializers import MilestoneSerializer
-from projects.models import TeamMembers
-from projects.progress import recalculate_project_progress
-from notifications.services import actor_message, notify_project_event
+from config.apps.projects.models import TeamMembers
+from config.apps.projects.progress import recalculate_project_progress
+from config.apps.notifications.services import actor_message, notify_project_event
 
 
 def _project_visible_to_user(project, user):

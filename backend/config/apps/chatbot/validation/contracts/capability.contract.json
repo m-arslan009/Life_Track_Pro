@@ -1,0 +1,19 @@
+{
+    "actions": [
+        {"id": "projects.createProject.post", "entity": "projects.Projects"},
+        {"id": "projects.projectDetail.put", "entity": "projects.Projects"},
+        {"id": "projects.projectDetail.delete", "entity": "projects.Projects"},
+        {"id": "projects.getAllProjects.get", "entity": "projects.Projects"},
+        {"id": "tasks.taskListCreate.post", "entity": "tasks.Task"},
+        {"id": "tasks.taskDetail.patch", "entity": "tasks.Task"},
+        {"id": "tasks.taskDetail.delete", "entity": "tasks.Task"},
+        {"id": "milestones.milestoneListCreate.get", "entity": "milestones.Milestone"},
+        {"id": "reports.reportsOverview.get", "entity": "reports.Report"}
+    ],
+    "entities": [
+        {"app": "projects", "model": "Projects"},
+        {"app": "tasks", "model": "Task"},
+        {"app": "milestones", "model": "Milestone"},
+        {"app": "reports", "model": "Report"}
+    ]
+}

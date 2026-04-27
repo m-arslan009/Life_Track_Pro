@@ -1,0 +1,31 @@
+{
+    "projects": {
+        "createProject": "POST /api/projects/",
+        "projectDetail": {
+            "get": "GET /api/projects/{id}/",
+            "put": "PUT /api/projects/{id}/",
+            "delete": "DELETE /api/projects/{id}/"
+        },
+        "getAllProjects": "GET /api/projects/"
+    },
+    "tasks": {
+        "taskListCreate": {
+            "get": "GET /api/tasks/",
+            "post": "POST /api/tasks/"
+        },
+        "taskDetail": {
+            "get": "GET /api/tasks/{id}/",
+            "patch": "PATCH /api/tasks/{id}/",
+            "delete": "DELETE /api/tasks/{id}/"
+        }
+    },
+    "milestones": {
+        "milestoneListCreate": {
+            "get": "GET /api/milestones/",
+            "post": "POST /api/milestones/"
+        }
+    },
+    "reports": {
+        "reportsOverview": "GET /api/reports/overview/"
+    }
+}

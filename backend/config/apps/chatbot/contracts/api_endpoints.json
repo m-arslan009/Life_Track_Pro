@@ -1,0 +1,224 @@
+{
+    "endpoints": [
+      {
+        "path": "/admin/",
+        "method": "N/A",
+        "app": "config",
+        "handler": "admin.site.urls",
+        "purpose": "Django admin site routes",
+        "auth": "Unknown",
+        "required": {},
+        "optional": {}
+      },
+      {
+        "path": "/api/users/",
+        "method": "POST",
+        "app": "users",
+        "handler": "signup_user",
+        "purpose": "Register a new user and create an auth token",
+        "auth": "No (AllowAny)",
+        "required": {
+          "body": ["username", "email", "password"]
+        },
+        "optional": {
+          "body": ["first_name", "last_name", "role"]
+        }
+      },
+      {
+        "path": "/api/users/login/",
+        "method": "POST",
+        "app": "users",
+        "handler": "user_login",
+        "purpose": "Log in and return token + user payload",
+        "auth": "No (AllowAny)",
+        "required": {
+          "body": ["username", "password"]
+        },
+        "optional": {}
+      },
+      {
+        "path": "/api/users/me/",
+        "method": "GET",
+        "app": "users",
+        "handler": "current_user",
+        "purpose": "Return authenticated user profile",
+        "auth": "Yes (Token or Session)",
+        "required": {},
+        "optional": {}
+      },
+      {
+        "path": "/api/users/users/",
+        "method": "GET",
+        "app": "users",
+        "handler": "getUsers",
+        "purpose": "List users excluding admin",
+        "auth": "Yes (Token or Session)",
+        "required": {},
+        "optional": {}
+      },
+      {
+        "path": "/api/users/<int:pk>/",
+        "method": "GET",
+        "app": "users",
+        "handler": "user_detail",
+        "purpose": "Retrieve user by ID",
+        "auth": "Yes (Token or Session)",
+        "required": {
+          "path": ["pk"]
+        },
+        "optional": {}
+      },
+      {
+        "path": "/api/users/<int:pk>/",
+        "method": "PUT/PATCH",
+        "app": "users",
+        "handler": "user_detail",
+        "purpose": "Update user",
+        "auth": "Yes (Token or Session)",
+        "required": {
+          "path": ["pk"]
+        },
+        "optional": {
+          "body": ["username", "email", "first_name", "last_name", "role"]
+        }
+      },
+      {
+        "path": "/api/projects/create/",
+        "method": "POST",
+        "app": "projects",
+        "handler": "createProject",
+        "purpose": "Create project",
+        "auth": "Yes",
+        "required": {
+          "body": ["project_name", "project_description", "status"]
+        },
+        "optional": {
+          "body": ["team_members", "progress", "start_date", "due_date"]
+        }
+      },
+      {
+        "path": "/api/projects/projects/",
+        "method": "GET",
+        "app": "projects",
+        "handler": "getAllProjects",
+        "purpose": "List visible projects",
+        "auth": "Yes",
+        "required": {},
+        "optional": {}
+      },
+      {
+        "path": "/api/projects/<int:pk>/",
+        "method": "PUT",
+        "app": "projects",
+        "handler": "projectDetail",
+        "purpose": "Update project",
+        "auth": "Yes",
+        "required": {
+          "path": ["pk"]
+        },
+        "optional": {
+          "body": ["any_project_fields", "team_members"]
+        }
+      },
+      {
+        "path": "/api/projects/<int:pk>/",
+        "method": "DELETE",
+        "app": "projects",
+        "handler": "projectDetail",
+        "purpose": "Delete project",
+        "auth": "Yes",
+        "required": {
+          "path": ["pk"]
+        },
+        "optional": {}
+      },
+      {
+        "path": "/api/tasks/tasks/",
+        "method": "POST",
+        "app": "tasks",
+        "handler": "taskListCreate",
+        "purpose": "Create task",
+        "auth": "Yes",
+        "required": {
+          "body": ["title", "project", "milestone"]
+        },
+        "optional": {
+          "body": ["description", "status", "assignee"]
+        }
+      },
+      {
+        "path": "/api/tasks/tasks/",
+        "method": "GET",
+        "app": "tasks",
+        "handler": "taskListCreate",
+        "purpose": "List tasks",
+        "auth": "Yes",
+        "required": {},
+        "optional": {
+          "query": ["project_id", "milestone_id"]
+        }
+      },
+      {
+        "path": "/api/tasks/tasks/<int:pk>/",
+        "method": "PATCH",
+        "app": "tasks",
+        "handler": "taskDetail",
+        "purpose": "Update task",
+        "auth": "Yes",
+        "required": {
+          "path": ["pk"]
+        },
+        "optional": {
+          "body": ["title", "description", "status", "project", "milestone", "assignee"]
+        }
+      },
+      {
+        "path": "/api/milestones/milestones/",
+        "method": "POST",
+        "app": "milestones",
+        "handler": "milestoneListCreate",
+        "purpose": "Create milestone",
+        "auth": "Yes",
+        "required": {
+          "body": ["title", "project"]
+        },
+        "optional": {
+          "body": ["description", "status", "start_date", "due_date", "members"]
+        }
+      },
+      {
+        "path": "/api/notifications/",
+        "method": "GET",
+        "app": "notifications",
+        "handler": "getNotifications",
+        "purpose": "List notifications",
+        "auth": "Yes",
+        "required": {},
+        "optional": {
+          "query": ["is_read", "type"]
+        }
+      },
+      {
+        "path": "/api/notifications/mark-as-read/<int:notification_id>/",
+        "method": "POST",
+        "app": "notifications",
+        "handler": "markAsRead",
+        "purpose": "Mark notification as read",
+        "auth": "Yes",
+        "required": {
+          "path": ["notification_id"]
+        },
+        "optional": {}
+      },
+      {
+        "path": "/api/reports/overview/",
+        "method": "GET",
+        "app": "reports",
+        "handler": "reportsOverview",
+        "purpose": "Get reports overview",
+        "auth": "Yes",
+        "required": {},
+        "optional": {}
+      }
+    ]
+  }

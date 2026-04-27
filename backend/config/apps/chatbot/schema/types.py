@@ -1,0 +1,1 @@
+# Architecture only - types placeholder

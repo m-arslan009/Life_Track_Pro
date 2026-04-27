@@ -1,6 +1,6 @@
 from typing import Iterable, Optional
 
-from projects.models import TeamMembers
+from config.apps.projects.models import TeamMembers
 
 from .models import Notification
 

@@ -19,11 +19,12 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/users/', include('users.urls')),
-    path('api/tasks/', include('tasks.urls')),
-    path('api/risks/', include('risks.urls')),
-    path('api/reports/', include('reports.urls')),
-    path('api/projects/', include('projects.urls')),
-    path('api/milestones/', include('milestones.urls')),
-    path('api/notifications/', include('notifications.urls')),
+    path('api/users/', include('config.apps.users.urls')),
+    path('api/tasks/', include('config.apps.tasks.urls')),
+    path('api/risks/', include('config.apps.risks.urls')),
+    path('api/reports/', include('config.apps.reports.urls')),
+    path('api/projects/', include('config.apps.projects.urls')),
+    path('api/milestones/', include('config.apps.milestones.urls')),
+    path('api/notifications/', include('config.apps.notifications.urls')),
+    path('api/chatbot/', include('config.apps.chatbot.urls')),
 ]

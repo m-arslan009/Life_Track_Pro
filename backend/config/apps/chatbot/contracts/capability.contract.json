@@ -1,0 +1,1071 @@
+{
+  "entities": [
+    {
+      "app": "users",
+      "model": "User",
+      "fields": [
+        { "name": "first_name", "type": "CharField", "required": true, "notes": "max_length=30" },
+        { "name": "last_name", "type": "CharField", "required": true, "notes": "max_length=30" },
+        {
+          "name": "role",
+          "type": "CharField",
+          "required": true,
+          "notes": "max_length=20; default=developer",
+          "choices": ["manager", "developer", "viewer"]
+        },
+        { "name": "username", "type": "CharField", "required": true, "notes": "max_length=30; unique=true" },
+        { "name": "email", "type": "EmailField", "required": true, "notes": "unique=true" },
+        { "name": "password", "type": "CharField", "required": true, "notes": "max_length=100" },
+        {
+          "name": "account_status",
+          "type": "CharField",
+          "required": true,
+          "notes": "default=active",
+          "choices": ["active", "suspended"]
+        }
+      ],
+      "relationships": [],
+      "choices": [
+        { "field": "role", "values": ["manager", "developer", "viewer"] },
+        { "field": "account_status", "values": ["active", "suspended"] }
+      ]
+    },
+    {
+      "app": "projects",
+      "model": "Projects",
+      "fields": [
+        { "name": "project_name", "type": "CharField", "required": true, "notes": "max_length=100" },
+        { "name": "project_description", "type": "TextField", "required": true },
+        {
+          "name": "status",
+          "type": "CharField",
+          "required": true,
+          "notes": "max_length=15",
+          "choices": ["active", "on_track", "at_risk", "complete"]
+        },
+        { "name": "progress", "type": "IntegerField", "required": true, "notes": "validators: 0..100" },
+        { "name": "start_date", "type": "DateField", "required": true },
+        { "name": "due_date", "type": "DateField", "required": true },
+        { "name": "owner_id", "type": "ForeignKey(users.User)", "required": true, "notes": "on_delete=CASCADE" }
+      ],
+      "relationships": [
+        { "type": "fk", "field": "owner_id", "to": "users.User" }
+      ],
+      "choices": [
+        { "field": "status", "values": ["active", "on_track", "at_risk", "complete"] }
+      ]
+    },
+    {
+      "app": "projects",
+      "model": "TeamMembers",
+      "fields": [
+        { "name": "Projects", "type": "ForeignKey(projects.Projects)", "required": true, "notes": "on_delete=CASCADE" },
+        { "name": "user", "type": "ForeignKey(users.User)", "required": true, "notes": "on_delete=CASCADE" },
+        { "name": "role", "type": "CharField", "required": true, "notes": "max_length=50" }
+      ],
+      "relationships": [
+        { "type": "fk", "field": "Projects", "to": "projects.Projects" },
+        { "type": "fk", "field": "user", "to": "users.User" }
+      ],
+      "choices": []
+    },
+    {
+      "app": "milestones",
+      "model": "Milestone",
+      "fields": [
+        { "name": "title", "type": "CharField", "required": true, "notes": "max_length=120" },
+        { "name": "description", "type": "TextField", "required": false, "notes": "blank=true" },
+        {
+          "name": "status",
+          "type": "CharField",
+          "required": true,
+          "notes": "max_length=20; default=planned",
+          "choices": ["planned", "in_progress", "completed", "delayed"]
+        },
+        { "name": "start_date", "type": "DateField", "required": true },
+        { "name": "due_date", "type": "DateField", "required": false, "notes": "blank=true; null=true" },
+        { "name": "project", "type": "ForeignKey(projects.Projects)", "required": true, "notes": "on_delete=CASCADE" },
+        { "name": "members", "type": "ManyToMany(projects.TeamMembers)", "required": false, "notes": "blank=true" },
+        { "name": "created_at", "type": "DateTimeField", "required": true, "notes": "auto_now_add=true" },
+        { "name": "updated_at", "type": "DateTimeField", "required": true, "notes": "auto_now=true" }
+      ],
+      "relationships": [
+        { "type": "fk", "field": "project", "to": "projects.Projects" },
+        { "type": "m2m", "field": "members", "to": "projects.TeamMembers" }
+      ],
+      "choices": [
+        { "field": "status", "values": ["planned", "in_progress", "completed", "delayed"] }
+      ]
+    },
+    {
+      "app": "tasks",
+      "model": "Task",
+      "fields": [
+        { "name": "title", "type": "CharField", "required": true, "notes": "max_length=120" },
+        { "name": "description", "type": "TextField", "required": false, "notes": "blank=true" },
+        {
+          "name": "status",
+          "type": "CharField",
+          "required": true,
+          "notes": "max_length=20; default=todo",
+          "choices": ["todo", "in_progress", "done", "blocked"]
+        },
+        { "name": "project", "type": "ForeignKey(projects.Projects)", "required": true, "notes": "on_delete=CASCADE" },
+        { "name": "milestone", "type": "ForeignKey(milestones.Milestone)", "required": true, "notes": "on_delete=CASCADE" },
+        {
+          "name": "assignee",
+          "type": "ForeignKey(projects.TeamMembers)",
+          "required": false,
+          "notes": "blank=true; null=true; on_delete=SET_NULL"
+        },
+        { "name": "created_at", "type": "DateTimeField", "required": true, "notes": "auto_now_add=true" },
+        { "name": "updated_at", "type": "DateTimeField", "required": true, "notes": "auto_now=true" }
+      ],
+      "relationships": [
+        { "type": "fk", "field": "project", "to": "projects.Projects" },
+        { "type": "fk", "field": "milestone", "to": "milestones.Milestone" },
+        { "type": "fk", "field": "assignee", "to": "projects.TeamMembers" }
+      ],
+      "choices": [
+        { "field": "status", "values": ["todo", "in_progress", "done", "blocked"] }
+      ]
+    },
+    {
+      "app": "notifications",
+      "model": "Notification",
+      "fields": [
+        { "name": "user", "type": "ForeignKey(users.User)", "required": true, "notes": "on_delete=CASCADE" },
+        {
+          "name": "notification_type",
+          "type": "CharField",
+          "required": true,
+          "notes": "max_length=30",
+          "choices": [
+            "project_created",
+            "project_updated",
+            "project_completed",
+            "milestone_created",
+            "milestone_completed",
+            "task_assigned",
+            "task_completed",
+            "task_blocked",
+            "team_member_added",
+            "project_at_risk",
+            "project_overdue"
+          ]
+        },
+        { "name": "title", "type": "CharField", "required": true, "notes": "max_length=200" },
+        { "name": "message", "type": "TextField", "required": true },
+        { "name": "project_id", "type": "IntegerField", "required": false, "notes": "null=true; blank=true" },
+        { "name": "project_name", "type": "CharField", "required": false, "notes": "max_length=100; null=true; blank=true" },
+        { "name": "task_id", "type": "IntegerField", "required": false, "notes": "null=true; blank=true" },
+        { "name": "task_name", "type": "CharField", "required": false, "notes": "max_length=120; null=true; blank=true" },
+        { "name": "milestone_id", "type": "IntegerField", "required": false, "notes": "null=true; blank=true" },
+        { "name": "milestone_name", "type": "CharField", "required": false, "notes": "max_length=150; null=true; blank=true" },
+        { "name": "created_at", "type": "DateTimeField", "required": true, "notes": "auto_now_add=true" },
+        { "name": "is_read", "type": "BooleanField", "required": true, "notes": "default=false" }
+      ],
+      "relationships": [
+        { "type": "fk", "field": "user", "to": "users.User" }
+      ],
+      "choices": [
+        {
+          "field": "notification_type",
+          "values": [
+            "project_created",
+            "project_updated",
+            "project_completed",
+            "milestone_created",
+            "milestone_completed",
+            "task_assigned",
+            "task_completed",
+            "task_blocked",
+            "team_member_added",
+            "project_at_risk",
+            "project_overdue"
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "id": "users.signup_user.post",
+      "http_method": "POST",
+      "endpoint": "/api/users/",
+      "unsafe": false,
+      "required_inputs": { "path": {}, "query": {}, "body": ["username", "email", "password"] },
+      "optional_inputs": { "path": {}, "query": {}, "body": ["first_name", "last_name", "role"] },
+      "constraints": [
+        "Authentication: AllowAny (no auth required).",
+        "Password min_length=6 (RegisterSerializer).",
+        "Creates DRF Token for the new user (Token.objects.get_or_create)."
+      ],
+      "possible_errors": [
+        {
+          "status": 400,
+          "format": "serializer.errors (DRF validation error dict)",
+          "origin": "view->serializer (users/views.py signup_user)",
+          "meaning": "Registration payload failed validation."
+        }
+      ]
+    },
+    {
+      "id": "users.user_login.post",
+      "http_method": "POST",
+      "endpoint": "/api/users/login/",
+      "unsafe": false,
+      "required_inputs": { "path": {}, "query": {}, "body": ["username", "password"] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": [
+        "Authentication: AllowAny (no auth required).",
+        "If user exists and password matches, returns token (Token.objects.get_or_create) and user payload."
+      ],
+      "possible_errors": [
+        {
+          "status": 404,
+          "format": "{'detail': 'No user found with this username.'}",
+          "origin": "view (users/views.py user_login)",
+          "meaning": "No user exists for the provided username."
+        },
+        {
+          "status": 401,
+          "format": "{'detail': 'Invalid password.'}",
+          "origin": "view (users/views.py user_login)",
+          "meaning": "Password did not match the user."
+        }
+      ]
+    },
+    {
+      "id": "users.current_user.get",
+      "http_method": "GET",
+      "endpoint": "/api/users/me/",
+      "unsafe": false,
+      "required_inputs": { "path": {}, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated (DEFAULT_AUTHENTICATION_CLASSES include TokenAuthentication and SessionAuthentication)."
+      ],
+      "possible_errors": [
+        {
+          "status": "Not found in code",
+          "format": "Not found in code",
+          "origin": "framework permission/auth handling",
+          "meaning": "Not found in code."
+        }
+      ]
+    },
+    {
+      "id": "users.getUsers.get",
+      "http_method": "GET",
+      "endpoint": "/api/users/users/",
+      "unsafe": false,
+      "required_inputs": { "path": {}, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated (TokenAuthentication or SessionAuthentication).",
+        "Excludes users where username == 'admin'."
+      ],
+      "possible_errors": [
+        {
+          "status": 500,
+          "format": "{\"detail\": \"Error fetching users\"}",
+          "origin": "view exception handler (users/views.py getUsers)",
+          "meaning": "Unexpected server error while fetching users."
+        }
+      ]
+    },
+    {
+      "id": "users.user_detail.get",
+      "http_method": "GET",
+      "endpoint": "/api/users/<int:pk>/",
+      "unsafe": false,
+      "required_inputs": { "path": { "pk": "int" }, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated (TokenAuthentication or SessionAuthentication).",
+        "User must exist for pk."
+      ],
+      "possible_errors": [
+        {
+          "status": 404,
+          "format": "empty response body (Response(status=404))",
+          "origin": "view (users/views.py user_detail)",
+          "meaning": "No user exists with that primary key."
+        }
+      ]
+    },
+    {
+      "id": "users.user_detail.put",
+      "http_method": "PUT",
+      "endpoint": "/api/users/<int:pk>/",
+      "unsafe": true,
+      "required_inputs": { "path": { "pk": "int" }, "query": {}, "body": "Not found in code" },
+      "optional_inputs": { "path": {}, "query": {}, "body": ["username", "email", "first_name", "last_name", "role"] },
+      "constraints": [
+        "Authentication: IsAuthenticated (TokenAuthentication or SessionAuthentication).",
+        "No self-only update restriction is enforced in this view (updates arbitrary pk if authenticated)."
+      ],
+      "possible_errors": [
+        {
+          "status": 404,
+          "format": "empty response body (Response(status=404))",
+          "origin": "view (users/views.py user_detail)",
+          "meaning": "No user exists with that primary key."
+        },
+        {
+          "status": 400,
+          "format": "serializer.errors (DRF validation error dict)",
+          "origin": "view->serializer (users/views.py user_detail)",
+          "meaning": "Update payload failed serializer validation."
+        }
+      ]
+    },
+    {
+      "id": "users.user_detail.patch",
+      "http_method": "PATCH",
+      "endpoint": "/api/users/<int:pk>/",
+      "unsafe": false,
+      "required_inputs": { "path": { "pk": "int" }, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": ["username", "email", "first_name", "last_name", "role"] },
+      "constraints": [
+        "Authentication: IsAuthenticated (TokenAuthentication or SessionAuthentication).",
+        "No self-only update restriction is enforced in this view (updates arbitrary pk if authenticated)."
+      ],
+      "possible_errors": [
+        {
+          "status": 404,
+          "format": "empty response body (Response(status=404))",
+          "origin": "view (users/views.py user_detail)",
+          "meaning": "No user exists with that primary key."
+        },
+        {
+          "status": 400,
+          "format": "serializer.errors (DRF validation error dict)",
+          "origin": "view->serializer (users/views.py user_detail)",
+          "meaning": "Update payload failed serializer validation."
+        }
+      ]
+    },
+    {
+      "id": "projects.createProject.post",
+      "http_method": "POST",
+      "endpoint": "/api/projects/create/",
+      "unsafe": false,
+      "required_inputs": { "path": {}, "query": {}, "body": ["project_name", "project_description", "status"] },
+      "optional_inputs": { "path": {}, "query": {}, "body": ["team_members", "progress", "start_date", "due_date"] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Owner is set to request.user (serializer.save(owner_id=request.user)).",
+        "If team_members provided, each user_id that exists becomes a TeamMembers row with role='developer' (nonexistent user IDs are skipped).",
+        "ProjectSerializer.create defaults: progress=0 if missing; start_date=today if missing; due_date=start_date+30 days if missing."
+      ],
+      "possible_errors": [
+        {
+          "status": 400,
+          "format": "serializer.errors (DRF validation error dict)",
+          "origin": "view->serializer (projects/views.py createProject)",
+          "meaning": "Project payload failed validation."
+        },
+        {
+          "status": 500,
+          "format": "{\"detail\": \"<exception string>\"}",
+          "origin": "view exception handler (projects/views.py createProject)",
+          "meaning": "Unhandled server error while creating project."
+        }
+      ]
+    },
+    {
+      "id": "projects.getAllProjects.get",
+      "http_method": "GET",
+      "endpoint": "/api/projects/projects/",
+      "unsafe": false,
+      "required_inputs": { "path": {}, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Returns projects where caller is owner OR is a TeamMembers user for the project."
+      ],
+      "possible_errors": [
+        {
+          "status": 500,
+          "format": "{'Detail': 'Unable to fetch Projects'}",
+          "origin": "view exception handler (projects/views.py getAllProjects)",
+          "meaning": "Unhandled server error while listing projects."
+        }
+      ]
+    },
+    {
+      "id": "projects.projectDashboardOverview.get",
+      "http_method": "GET",
+      "endpoint": "/api/projects/dashboard/",
+      "unsafe": false,
+      "required_inputs": { "path": {}, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Overview derived from projects visible to caller (owner or team member), filtered to status in ['active','on_track','at_risk']."
+      ],
+      "possible_errors": []
+    },
+    {
+      "id": "projects.projectDetail.put",
+      "http_method": "PUT",
+      "endpoint": "/api/projects/<int:pk>/",
+      "unsafe": false,
+      "required_inputs": { "path": { "pk": "int" }, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": ["project_name", "project_description", "status", "progress", "start_date", "due_date", "team_members"] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Owner-only: project.owner_id must equal request.user else 403.",
+        "If body contains team_members, team membership is synchronized: remove members not present; add new as role='developer' (nonexistent user IDs skipped)."
+      ],
+      "possible_errors": [
+        {
+          "status": 404,
+          "format": "{'Detail': 'Project not found'}",
+          "origin": "view (projects/views.py projectDetail)",
+          "meaning": "Project ID does not exist."
+        },
+        {
+          "status": 403,
+          "format": "{'Detail': \"You don't have permission to perform this action\"}",
+          "origin": "view permission check (projects/views.py projectDetail)",
+          "meaning": "Only project owner can update."
+        },
+        {
+          "status": 400,
+          "format": "serializer.errors (DRF validation error dict)",
+          "origin": "view->serializer (projects/views.py projectDetail)",
+          "meaning": "Update payload failed validation."
+        }
+      ]
+    },
+    {
+      "id": "projects.projectDetail.delete",
+      "http_method": "DELETE",
+      "endpoint": "/api/projects/<int:pk>/",
+      "unsafe": false,
+      "required_inputs": { "path": { "pk": "int" }, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Owner-only: project.owner_id must equal request.user else 403."
+      ],
+      "possible_errors": [
+        {
+          "status": 404,
+          "format": "{'Detail': 'Project not found'}",
+          "origin": "view (projects/views.py projectDetail)",
+          "meaning": "Project ID does not exist."
+        },
+        {
+          "status": 403,
+          "format": "{'Detail': \"You don't have permission to perform this action\"}",
+          "origin": "view permission check (projects/views.py projectDetail)",
+          "meaning": "Only project owner can delete."
+        }
+      ]
+    },
+    {
+      "id": "projects.projectStatusUpdate.patch",
+      "http_method": "PATCH",
+      "endpoint": "/api/projects/<int:pk>/status/",
+      "unsafe": false,
+      "required_inputs": { "path": { "pk": "int" }, "query": {}, "body": ["status"] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Owner-only: only the project owner can change status.",
+        "Body status must be one of the model's Projects.status choice keys."
+      ],
+      "possible_errors": [
+        {
+          "status": 404,
+          "format": "{'Detail': 'Project not found'}",
+          "origin": "view (projects/views.py projectStatusUpdate)",
+          "meaning": "Project ID does not exist."
+        },
+        {
+          "status": 403,
+          "format": "{'Detail': 'Only the project owner can change project status'}",
+          "origin": "view permission check (projects/views.py projectStatusUpdate)",
+          "meaning": "Caller is not the project owner."
+        },
+        {
+          "status": 400,
+          "format": "{'status': ['Invalid status. Allowed values: ...']}",
+          "origin": "view validation (projects/views.py projectStatusUpdate)",
+          "meaning": "Provided status is not an allowed project status."
+        }
+      ]
+    },
+    {
+      "id": "tasks.taskListCreate.get",
+      "http_method": "GET",
+      "endpoint": "/api/tasks/tasks/",
+      "unsafe": false,
+      "required_inputs": { "path": {}, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": { "project_id": "string", "milestone_id": "string" }, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Only tasks in projects where caller is owner or team member are included."
+      ],
+      "possible_errors": []
+    },
+    {
+      "id": "tasks.taskListCreate.post",
+      "http_method": "POST",
+      "endpoint": "/api/tasks/tasks/",
+      "unsafe": false,
+      "required_inputs": { "path": {}, "query": {}, "body": ["title", "project", "milestone"] },
+      "optional_inputs": { "path": {}, "query": {}, "body": ["description", "status", "assignee"] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Owner-only create: only project owner can create tasks.",
+        "Serializer validation: milestone must belong to project; assignee must belong to project; caller must have access to selected project (owner or team member)."
+      ],
+      "possible_errors": [
+        {
+          "status": 403,
+          "format": "{\"Detail\": \"Only the project owner can create tasks\"}",
+          "origin": "view permission check (tasks/views.py taskListCreate)",
+          "meaning": "Caller is not the owner of the project."
+        },
+        {
+          "status": 400,
+          "format": "serializer.errors (includes TaskSerializer ValidationError shapes)",
+          "origin": "view->serializer (tasks/views.py taskListCreate; tasks/serializers.py)",
+          "meaning": "Task payload invalid (including project/milestone/assignee relationship rules)."
+        }
+      ]
+    },
+    {
+      "id": "tasks.taskDetail.get",
+      "http_method": "GET",
+      "endpoint": "/api/tasks/tasks/<int:pk>/",
+      "unsafe": false,
+      "required_inputs": { "path": { "pk": "int" }, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Project visibility required: caller must be project owner or team member."
+      ],
+      "possible_errors": [
+        {
+          "status": 404,
+          "format": "{\"Detail\": \"Task not found\"}",
+          "origin": "view (tasks/views.py taskDetail)",
+          "meaning": "Task ID does not exist."
+        },
+        {
+          "status": 403,
+          "format": "{\"Detail\": \"You do not have permission to access this task\"}",
+          "origin": "view permission check (tasks/views.py taskDetail)",
+          "meaning": "Caller cannot access the task's project."
+        }
+      ]
+    },
+    {
+      "id": "tasks.taskDetail.put",
+      "http_method": "PUT",
+      "endpoint": "/api/tasks/tasks/<int:pk>/",
+      "unsafe": false,
+      "required_inputs": { "path": { "pk": "int" }, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": ["title", "description", "status", "project", "milestone", "assignee"] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Project visibility required to access; owner-only to update.",
+        "Serializer validation: milestone must belong to project; assignee must belong to project; caller must have access to selected project."
+      ],
+      "possible_errors": [
+        {
+          "status": 404,
+          "format": "{\"Detail\": \"Task not found\"}",
+          "origin": "view (tasks/views.py taskDetail)",
+          "meaning": "Task ID does not exist."
+        },
+        {
+          "status": 403,
+          "format": "{\"Detail\": \"You do not have permission to access this task\"}",
+          "origin": "view permission check (tasks/views.py taskDetail)",
+          "meaning": "Caller cannot access the task's project."
+        },
+        {
+          "status": 403,
+          "format": "{\"Detail\": \"Only the project owner can update tasks\"}",
+          "origin": "view permission check (tasks/views.py taskDetail)",
+          "meaning": "Caller is not the project owner."
+        },
+        {
+          "status": 400,
+          "format": "serializer.errors (includes TaskSerializer ValidationError shapes)",
+          "origin": "view->serializer (tasks/views.py taskDetail; tasks/serializers.py)",
+          "meaning": "Update payload invalid."
+        }
+      ]
+    },
+    {
+      "id": "tasks.taskDetail.patch",
+      "http_method": "PATCH",
+      "endpoint": "/api/tasks/tasks/<int:pk>/",
+      "unsafe": false,
+      "required_inputs": { "path": { "pk": "int" }, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": ["title", "description", "status", "project", "milestone", "assignee"] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Project visibility required to access; owner-only to update."
+      ],
+      "possible_errors": [
+        {
+          "status": 404,
+          "format": "{\"Detail\": \"Task not found\"}",
+          "origin": "view (tasks/views.py taskDetail)",
+          "meaning": "Task ID does not exist."
+        },
+        {
+          "status": 403,
+          "format": "{\"Detail\": \"You do not have permission to access this task\"}",
+          "origin": "view permission check (tasks/views.py taskDetail)",
+          "meaning": "Caller cannot access the task's project."
+        },
+        {
+          "status": 403,
+          "format": "{\"Detail\": \"Only the project owner can update tasks\"}",
+          "origin": "view permission check (tasks/views.py taskDetail)",
+          "meaning": "Caller is not the project owner."
+        },
+        {
+          "status": 400,
+          "format": "serializer.errors",
+          "origin": "view->serializer (tasks/views.py taskDetail)",
+          "meaning": "Update payload invalid."
+        }
+      ]
+    },
+    {
+      "id": "tasks.taskDetail.delete",
+      "http_method": "DELETE",
+      "endpoint": "/api/tasks/tasks/<int:pk>/",
+      "unsafe": false,
+      "required_inputs": { "path": { "pk": "int" }, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Project visibility required to access; owner-only to delete."
+      ],
+      "possible_errors": [
+        {
+          "status": 404,
+          "format": "{\"Detail\": \"Task not found\"}",
+          "origin": "view (tasks/views.py taskDetail)",
+          "meaning": "Task ID does not exist."
+        },
+        {
+          "status": 403,
+          "format": "{\"Detail\": \"You do not have permission to access this task\"}",
+          "origin": "view permission check (tasks/views.py taskDetail)",
+          "meaning": "Caller cannot access the task's project."
+        },
+        {
+          "status": 403,
+          "format": "{\"Detail\": \"Only the project owner can delete tasks\"}",
+          "origin": "view permission check (tasks/views.py taskDetail)",
+          "meaning": "Caller is not the project owner."
+        }
+      ]
+    },
+    {
+      "id": "tasks.taskStatusUpdate.patch",
+      "http_method": "PATCH",
+      "endpoint": "/api/tasks/tasks/<int:pk>/status/",
+      "unsafe": false,
+      "required_inputs": { "path": { "pk": "int" }, "query": {}, "body": ["status"] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Permission: caller must be project owner OR team member OR (task has assignee and task.assignee.user_id equals caller id).",
+        "Body status must be one of Task.STATUS_CHOICES keys."
+      ],
+      "possible_errors": [
+        {
+          "status": 404,
+          "format": "{\"Detail\": \"Task not found\"}",
+          "origin": "view (tasks/views.py taskStatusUpdate)",
+          "meaning": "Task ID does not exist."
+        },
+        {
+          "status": 403,
+          "format": "{\"Detail\": \"You do not have permission to update this task status\"}",
+          "origin": "view permission check (tasks/views.py taskStatusUpdate)",
+          "meaning": "Caller is not allowed to change this task's status."
+        },
+        {
+          "status": 400,
+          "format": "{\"status\": [\"Invalid status. Allowed values: ...\"]}",
+          "origin": "view validation (tasks/views.py taskStatusUpdate)",
+          "meaning": "Provided task status is not an allowed value."
+        }
+      ]
+    },
+    {
+      "id": "milestones.milestoneListCreate.get",
+      "http_method": "GET",
+      "endpoint": "/api/milestones/milestones/",
+      "unsafe": false,
+      "required_inputs": { "path": {}, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": { "project_id": "string" }, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Only milestones in projects where caller is owner or team member are included."
+      ],
+      "possible_errors": []
+    },
+    {
+      "id": "milestones.milestoneListCreate.post",
+      "http_method": "POST",
+      "endpoint": "/api/milestones/milestones/",
+      "unsafe": false,
+      "required_inputs": { "path": {}, "query": {}, "body": ["title", "project"] },
+      "optional_inputs": { "path": {}, "query": {}, "body": ["description", "status", "start_date", "due_date", "members"] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Owner-only create: only project owner can create milestones.",
+        "Serializer validation includes: due_date >= start_date; status alias mapping; caller must have access to project (owner or team member); members (TeamMembers) must belong to project."
+      ],
+      "possible_errors": [
+        {
+          "status": 403,
+          "format": "{\"Detail\": \"Only the project owner can create milestones\"}",
+          "origin": "view permission check (milestones/views.py milestoneListCreate)",
+          "meaning": "Caller is not the owner of the project."
+        },
+        {
+          "status": 400,
+          "format": "serializer.errors (includes MilestoneSerializer ValidationError shapes)",
+          "origin": "view->serializer (milestones/views.py milestoneListCreate; milestones/serializers.py)",
+          "meaning": "Milestone payload invalid."
+        }
+      ]
+    },
+    {
+      "id": "milestones.milestoneCreateAlias.post",
+      "http_method": "POST",
+      "endpoint": "/api/milestones/create/",
+      "unsafe": false,
+      "required_inputs": { "path": {}, "query": {}, "body": ["title", "project"] },
+      "optional_inputs": { "path": {}, "query": {}, "body": ["description", "status", "start_date", "due_date", "members"] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Alias route to milestoneListCreate; same rules apply."
+      ],
+      "possible_errors": [
+        {
+          "status": 403,
+          "format": "{\"Detail\": \"Only the project owner can create milestones\"}",
+          "origin": "view permission check (milestones/views.py milestoneListCreate)",
+          "meaning": "Caller is not the owner of the project."
+        },
+        {
+          "status": 400,
+          "format": "serializer.errors",
+          "origin": "view->serializer (milestones/views.py milestoneListCreate)",
+          "meaning": "Milestone payload invalid."
+        }
+      ]
+    },
+    {
+      "id": "milestones.milestoneDetail.get",
+      "http_method": "GET",
+      "endpoint": "/api/milestones/<int:pk>/",
+      "unsafe": false,
+      "required_inputs": { "path": { "pk": "int" }, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Project visibility required: caller must be project owner or team member."
+      ],
+      "possible_errors": [
+        {
+          "status": 404,
+          "format": "{\"Detail\": \"Milestone not found\"}",
+          "origin": "view (milestones/views.py milestoneDetail)",
+          "meaning": "Milestone ID does not exist."
+        },
+        {
+          "status": 403,
+          "format": "{\"Detail\": \"You do not have permission to access this milestone\"}",
+          "origin": "view permission check (milestones/views.py milestoneDetail)",
+          "meaning": "Caller cannot access the milestone's project."
+        }
+      ]
+    },
+    {
+      "id": "milestones.milestoneDetail.put",
+      "http_method": "PUT",
+      "endpoint": "/api/milestones/<int:pk>/",
+      "unsafe": false,
+      "required_inputs": { "path": { "pk": "int" }, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": ["title", "description", "status", "start_date", "due_date", "project", "members"] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Project visibility required to access; owner-only to update.",
+        "Serializer validation includes due_date/start_date ordering, status alias mapping, project access, and member-project consistency."
+      ],
+      "possible_errors": [
+        {
+          "status": 404,
+          "format": "{\"Detail\": \"Milestone not found\"}",
+          "origin": "view (milestones/views.py milestoneDetail)",
+          "meaning": "Milestone ID does not exist."
+        },
+        {
+          "status": 403,
+          "format": "{\"Detail\": \"You do not have permission to access this milestone\"}",
+          "origin": "view permission check (milestones/views.py milestoneDetail)",
+          "meaning": "Caller cannot access the milestone's project."
+        },
+        {
+          "status": 403,
+          "format": "{\"Detail\": \"Only the project owner can update milestones\"}",
+          "origin": "view permission check (milestones/views.py milestoneDetail)",
+          "meaning": "Caller is not the project owner."
+        },
+        {
+          "status": 400,
+          "format": "serializer.errors",
+          "origin": "view->serializer (milestones/views.py milestoneDetail)",
+          "meaning": "Update payload invalid."
+        }
+      ]
+    },
+    {
+      "id": "milestones.milestoneDetail.patch",
+      "http_method": "PATCH",
+      "endpoint": "/api/milestones/<int:pk>/",
+      "unsafe": false,
+      "required_inputs": { "path": { "pk": "int" }, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": ["title", "description", "status", "start_date", "due_date", "project", "members"] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Project visibility required to access; owner-only to update."
+      ],
+      "possible_errors": [
+        {
+          "status": 404,
+          "format": "{\"Detail\": \"Milestone not found\"}",
+          "origin": "view (milestones/views.py milestoneDetail)",
+          "meaning": "Milestone ID does not exist."
+        },
+        {
+          "status": 403,
+          "format": "{\"Detail\": \"You do not have permission to access this milestone\"}",
+          "origin": "view permission check (milestones/views.py milestoneDetail)",
+          "meaning": "Caller cannot access the milestone's project."
+        },
+        {
+          "status": 403,
+          "format": "{\"Detail\": \"Only the project owner can update milestones\"}",
+          "origin": "view permission check (milestones/views.py milestoneDetail)",
+          "meaning": "Caller is not the project owner."
+        },
+        {
+          "status": 400,
+          "format": "serializer.errors",
+          "origin": "view->serializer (milestones/views.py milestoneDetail)",
+          "meaning": "Update payload invalid."
+        }
+      ]
+    },
+    {
+      "id": "milestones.milestoneDetail.delete",
+      "http_method": "DELETE",
+      "endpoint": "/api/milestones/<int:pk>/",
+      "unsafe": false,
+      "required_inputs": { "path": { "pk": "int" }, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Project visibility required to access; owner-only to delete."
+      ],
+      "possible_errors": [
+        {
+          "status": 404,
+          "format": "{\"Detail\": \"Milestone not found\"}",
+          "origin": "view (milestones/views.py milestoneDetail)",
+          "meaning": "Milestone ID does not exist."
+        },
+        {
+          "status": 403,
+          "format": "{\"Detail\": \"You do not have permission to access this milestone\"}",
+          "origin": "view permission check (milestones/views.py milestoneDetail)",
+          "meaning": "Caller cannot access the milestone's project."
+        },
+        {
+          "status": 403,
+          "format": "{\"Detail\": \"Only the project owner can delete milestones\"}",
+          "origin": "view permission check (milestones/views.py milestoneDetail)",
+          "meaning": "Caller is not the project owner."
+        }
+      ]
+    },
+    {
+      "id": "milestones.milestoneStatusUpdate.patch",
+      "http_method": "PATCH",
+      "endpoint": "/api/milestones/<int:pk>/status/",
+      "unsafe": false,
+      "required_inputs": { "path": { "pk": "int" }, "query": {}, "body": ["status"] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Owner-only: only project owner can update milestone status.",
+        "Body status must be one of Milestone.STATUS_CHOICES keys."
+      ],
+      "possible_errors": [
+        {
+          "status": 404,
+          "format": "{\"Detail\": \"Milestone not found\"}",
+          "origin": "view (milestones/views.py milestoneStatusUpdate)",
+          "meaning": "Milestone ID does not exist."
+        },
+        {
+          "status": 403,
+          "format": "{\"Detail\": \"Only the project owner can update milestone status\"}",
+          "origin": "view permission check (milestones/views.py milestoneStatusUpdate)",
+          "meaning": "Caller is not the project owner."
+        },
+        {
+          "status": 400,
+          "format": "{\"status\": [\"Invalid status. Allowed values: ...\"]}",
+          "origin": "view validation (milestones/views.py milestoneStatusUpdate)",
+          "meaning": "Provided milestone status is not an allowed value."
+        }
+      ]
+    },
+    {
+      "id": "notifications.getNotifications.get",
+      "http_method": "GET",
+      "endpoint": "/api/notifications/",
+      "unsafe": false,
+      "required_inputs": { "path": {}, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": { "is_read": "string", "type": "string" }, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Always scopes notifications to Notification.user == request.user."
+      ],
+      "possible_errors": []
+    },
+    {
+      "id": "notifications.getRecentNotifications.get",
+      "http_method": "GET",
+      "endpoint": "/api/notifications/recent/",
+      "unsafe": false,
+      "required_inputs": { "path": {}, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Returns notifications for request.user created within last 24 hours, limited to 10."
+      ],
+      "possible_errors": []
+    },
+    {
+      "id": "notifications.markAsRead.post",
+      "http_method": "POST",
+      "endpoint": "/api/notifications/mark-as-read/<int:notification_id>/",
+      "unsafe": false,
+      "required_inputs": { "path": { "notification_id": "int" }, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Notification must exist with id == notification_id and user == request.user."
+      ],
+      "possible_errors": [
+        {
+          "status": 404,
+          "format": "{\"error\": \"Notification not found\"}",
+          "origin": "view (notifications/views.py markAsRead)",
+          "meaning": "Notification not found for this user."
+        }
+      ]
+    },
+    {
+      "id": "notifications.markAllAsRead.post",
+      "http_method": "POST",
+      "endpoint": "/api/notifications/mark-all-as-read/",
+      "unsafe": false,
+      "required_inputs": { "path": {}, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Marks all unread notifications for request.user as read."
+      ],
+      "possible_errors": []
+    },
+    {
+      "id": "notifications.deleteNotification.delete",
+      "http_method": "DELETE",
+      "endpoint": "/api/notifications/delete/<int:notification_id>/",
+      "unsafe": false,
+      "required_inputs": { "path": { "notification_id": "int" }, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Notification must exist with id == notification_id and user == request.user."
+      ],
+      "possible_errors": [
+        {
+          "status": 404,
+          "format": "{\"error\": \"Notification not found\"}",
+          "origin": "view (notifications/views.py deleteNotification)",
+          "meaning": "Notification not found for this user."
+        }
+      ]
+    },
+    {
+      "id": "notifications.deleteAllNotifications.post",
+      "http_method": "POST",
+      "endpoint": "/api/notifications/delete-all/",
+      "unsafe": false,
+      "required_inputs": { "path": {}, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "Deletes all notifications where user == request.user."
+      ],
+      "possible_errors": []
+    },
+    {
+      "id": "reports.reportsOverview.get",
+      "http_method": "GET",
+      "endpoint": "/api/reports/overview/",
+      "unsafe": false,
+      "required_inputs": { "path": {}, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": [
+        "Authentication: IsAuthenticated.",
+        "All calculations scope to projects visible to the user: owner OR team member."
+      ],
+      "possible_errors": []
+    },
+    {
+      "id": "risks.placeholder",
+      "http_method": "Not found in code",
+      "endpoint": "/api/risks/",
+      "unsafe": true,
+      "required_inputs": { "path": {}, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": ["Not found in code: risks.urls defines an empty urlpatterns list."],
+      "possible_errors": []
+    },
+    {
+      "id": "admin.site",
+      "http_method": "Not found in code",
+      "endpoint": "/admin/",
+      "unsafe": true,
+      "required_inputs": { "path": {}, "query": {}, "body": [] },
+      "optional_inputs": { "path": {}, "query": {}, "body": [] },
+      "constraints": ["Not found in code: this contract does not enumerate Django admin sub-routes or methods."],
+      "possible_errors": []
+    }
+  ]
+}

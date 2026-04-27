@@ -1,5 +1,5 @@
 from django.db import models
-from projects.models import Projects, TeamMembers
+from config.apps.projects.models import Projects, TeamMembers
 
 
 class Milestone(models.Model):
