@@ -5,9 +5,18 @@ Django settings for config project.
 from pathlib import Path
 import sys
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+# __file__ = backend/config/config/settings.py
+# .parent.parent = backend/config/
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load .env file from backend/ root (one level above BASE_DIR)
+load_dotenv(BASE_DIR.parent / '.env')
+
+# Load environment variables
+load_dotenv(BASE_DIR / ".env")
 
 # Add the apps directory to sys.path so Django can find the app modules
 APPS_DIR = BASE_DIR / 'apps'
@@ -47,6 +56,7 @@ INSTALLED_APPS = [
     'projects',
     'milestones',
     'notifications',
+    'chatbot',
 ]
 
 MIDDLEWARE = [
