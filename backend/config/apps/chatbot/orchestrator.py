@@ -12,6 +12,49 @@ from .executor import execute_operation
 logger = logging.getLogger(__name__)
 
 
+def _format_success_response(execution_result):
+    """Format successful READ operation results for display."""
+    if not execution_result.get("success"):
+        return success(execution_result)
+    
+    # Handle READ operation results
+    if "projects" in execution_result:
+        projects = execution_result["projects"]
+        if not projects:
+            return "No projects found."
+        lines = ["Here are your projects:"]
+        for p in projects:
+            lines.append(f"  • {p['name']} (Status: {p['status']})")
+        return "\n".join(lines)
+    
+    elif "tasks" in execution_result:
+        tasks = execution_result["tasks"]
+        if not tasks:
+            return "No tasks found."
+        lines = ["Here are your tasks:"]
+        for t in tasks:
+            lines.append(f"  • {t['title']} (Status: {t['status']})")
+        return "\n".join(lines)
+    
+    elif "milestones" in execution_result:
+        milestones = execution_result["milestones"]
+        if not milestones:
+            return "No milestones found."
+        lines = ["Here are your milestones:"]
+        for m in milestones:
+            lines.append(f"  • {m['title']} (Status: {m['status']})")
+        return "\n".join(lines)
+    
+    # Handle DELETE operation results
+    elif "deleted" in execution_result:
+        deleted_type = execution_result["deleted"]
+        name = execution_result.get("name", "Unknown")
+        return f"Successfully deleted {deleted_type}: {name}"
+    
+    # For non-READ/DELETE operations, use LLM to generate success message
+    return success(execution_result)
+
+
 def handle_message(message: str, session_id: str, user=None) -> Dict[str, Any]:
     """
     Orchestrates the full chatbot message handling flow.
@@ -55,15 +98,28 @@ def handle_message(message: str, session_id: str, user=None) -> Dict[str, Any]:
             "missing_fields": [],
             "errors": [error_msg]
         }
-
-    # 3. Update state
+    
+    # 3. Update state with new fields
     state = dict(session) if session else {}
     collected = state.get("collected_fields", {})
     new_fields = parsed.get("fields", {})
     collected.update(new_fields)
-
+    
+    # Check if we should clear previous state (new intent started)
+    prev_missing = session.get("missing_fields", []) if session else []
+    prev_intent = session.get("last_intent") if session else None
+    current_intent = parsed.get("intent")
+    
+    # If user sends a NEW intent (different from previous), clear old state
+    if prev_missing and prev_intent and prev_intent != "UNKNOWN" and current_intent != "UNKNOWN":
+        if current_intent != prev_intent:
+            print(f"[ORCHESTRATOR] New intent detected: {current_intent}, clearing previous state")
+            collected = {}
+            collected.update(new_fields)
+            state["collected_fields"] = collected
+    
     state["collected_fields"] = collected
-    state["last_intent"] = parsed.get("intent")
+    state["last_intent"] = current_intent
     state["last_message"] = message
     print(f"[ORCHESTRATOR] Updated state with fields: {new_fields}")
     print(f"[ORCHESTRATOR] Total collected fields: {collected}")
@@ -79,23 +135,26 @@ def handle_message(message: str, session_id: str, user=None) -> Dict[str, Any]:
             "errors": []
         }
 
-    # Check for missing required fields
-    required = {
-        "CREATE_PROJECT": ["project_name", "due_date", "start_date"],
-        "CREATE_TASK": ["title", "project_id"],
-        "UPDATE_TASK": ["task_id"],
-        "READ": [],
-    }
-
-    required_for_intent = required.get(intent_type, [])
+    # Check for missing required fields using validator
+    # First, plan the schema to get the operation
+    planned = plan_schema({"intent": intent_type, "fields": collected, "confidence": parsed.get("confidence", 0.0)})
+    validation = validate(planned)
+    missing_fields = []
+    
+    # Get required fields from validator
+    from .validator import REQUIRED_FIELDS
+    required_for_intent = REQUIRED_FIELDS.get(planned["operation"], [])
     missing_fields = [f for f in required_for_intent if not collected.get(f)]
-    print(f"[ORCHESTRATOR] Required fields for {intent_type}: {required_for_intent}")
+    
+    print(f"[ORCHESTRATOR] Operation: {planned['operation']}")
+    print(f"[ORCHESTRATOR] Required fields for {planned['operation']}: {required_for_intent}")
     print(f"[ORCHESTRATOR] Missing fields: {missing_fields}")
 
     # 4. If missing fields → gateway_explainer
     if missing_fields:
         print(f"[ORCHESTRATOR] Missing fields detected, calling gateway_explainer...")
         state["missing_fields"] = missing_fields
+        state["last_intent"] = intent_type
         save_session(session_id, state)
         response_text = ask_for_missing({"missing_fields": missing_fields})
         print(f"[ORCHESTRATOR] Gateway explainer response: {response_text[:200]}...")
@@ -150,8 +209,8 @@ def handle_message(message: str, session_id: str, user=None) -> Dict[str, Any]:
         }
 
     # 8. Return success response
-    print(f"[ORCHESTRATOR] Execution successful. Calling success explainer...")
-    success_msg = success(execution_result)
+    print(f"[ORCHESTRATOR] Execution successful. Formatting response...")
+    success_msg = _format_success_response(execution_result)
     print(f"[ORCHESTRATOR] Success message: {success_msg[:200]}...")
     save_session(session_id, state)
 

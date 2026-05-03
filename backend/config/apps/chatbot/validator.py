@@ -3,9 +3,20 @@ from typing import Dict, Any, List
 
 
 REQUIRED_FIELDS = {
-    "CREATE_PROJECT": ["project_name", "due_date"],
+    "CREATE_PROJECT": ["project_name", "start_date", "due_date"],
     "CREATE_TASK": ["title", "project_id"],
+    "CREATE_MILESTONE": ["title", "project_id", "start_date", "due_date"],
+    "UPDATE_PROJECT": ["project_id"],
     "UPDATE_TASK": ["task_id"],
+    "UPDATE_MILESTONE": ["milestone_id"],
+    "ADD_MEMBER": ["project_id", "user_id"],
+    "REMOVE_MEMBER": ["project_id", "member_id"],
+    "UPDATE_MEMBER_ROLE": ["project_id", "member_id"],
+    "DELETE_MILESTONE": ["milestone_id"],
+    "DELETE_TASKS_BY_PROJECT": ["project_id"],
+    "DELETE_TASKS_BY_MILESTONE": ["milestone_id", "project_id"],
+    "SHOW_MEMBERS": ["project_id"],
+    "READ": ["query_type"],
 }
 
 
